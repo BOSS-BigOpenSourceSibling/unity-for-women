@@ -43,11 +43,11 @@ namespace PartV
 			{
 				return;
 			}
-			
+
 			var x = Input.GetAxis("Horizontal");
 			// transform.position += x * maxSpeed * transform.right * Time.deltaTime;
 			rigidBody.velocity = new Vector2(x * maxSpeed, rigidBody.velocity.y);
-			
+
 			playerImage.transform.localScale = new Vector3(Mathf.Sign(x), 1.0f, 1.0f);
 
 			var jump = Input.GetAxis("Jump");
@@ -71,6 +71,8 @@ namespace PartV
 				canPlayAudioAgain = false;
 				audioSource.PlayOneShot(jumpClip);
 			}
+
+			animator.SetBool("Jumping", isJumping);
 		}
 
 		// OnCollisionEnter2D is called whenever the player hits something
