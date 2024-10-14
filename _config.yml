@@ -22,7 +22,7 @@ plugins:
 - jekyll-remote-theme
 
 # Site settings
-url: 'https://laisczt.github.io'
+url: 'boss-bigopensourcesibling.github.io'
 baseurl: '/unity-for-women'
 title: 'Unity for Women'
 description: 'Workshop para desenvolvimento de jogos em Unity'
