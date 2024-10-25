@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/unity-for-women/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/unity-for-women/" rel="alternate" type="text/html" /><updated>2024-10-24T22:32:12-03:00</updated><id>http://localhost:4000/unity-for-women/feed.xml</id><title type="html">Unity for Women</title><subtitle>Workshop para desenvolvimento de jogos em Unity</subtitle><entry><title type="html">Desenvolvendo o nível</title><link href="http://localhost:4000/unity-for-women/2024/01/05/Desenvolvendo-N%C3%ADvel.html" rel="alternate" type="text/html" title="Desenvolvendo o nível" /><published>2024-01-05T12:00:00-03:00</published><updated>2024-01-05T12:00:00-03:00</updated><id>http://localhost:4000/unity-for-women/2024/01/05/Desenvolvendo%20N%C3%ADvel</id><content type="html" xml:base="http://localhost:4000/unity-for-women/2024/01/05/Desenvolvendo-N%C3%ADvel.html"><![CDATA[<h2 id="expandindo-a-fase">Expandindo a fase</h2>
+
+<p><img src="../../../img/level_expanded.png" alt="Nível maior" /></p>
+
+<ul>
+  <li>Podemos expandir o nível já criado utilizando as ferramentas que já vimos anteriormente.</li>
+  <li>Lembre-se de manter a organização dos blocos do chão e dos planos de fundo.</li>
+</ul>
+
+<h2 id="movimento-da-câmera">Movimento da câmera</h2>
+
+<p>Como jogadores, ainda não podemos navegar essa fase, pois a câmera não segue o personagem.
+Assim como fizemos para movimentar o jogador, podemos adicionar à câmera um script para movimentá-la também, já que a câmera também é um objeto manipulável.</p>
+
+<ol>
+  <li>Crie um novo script para a câmera, e dê um nome como “CameraMovimentation” ou algo similar</li>
+</ol>
+
+<p>Queremos que a nossa câmera siga o jogador, para isso precisamos saber onde ele está dentro do script</p>
+
+<ol>
+  <li>Antes de Start() e Update(), crie a seguinte variável pública, que servirá de referência ao jogador:
+    <pre><code class="language-C#">public class CameraMovimentation : MonoBehaviour
+{
+   public GameObject player;
+   .
+   .
+   .
+}
+</code></pre>
+  </li>
+  <li>
+    <p>Salvando o código, volte no editor e arraste o objeto jogador até a caixa correspondente à essa variável no inspetor</p>
+
+    <p><img src="../../../img/player_attach.png" alt="Linkando um objeto à uma variável pelo editor" /></p>
+  </li>
+</ol>
+
+<p>⚠ Lembre-se desse processo de atribuir componentes/objetos à variáveis públicas pelo editor, não a ilustraremos mais a partir daqui</p>
+
+<p>Agora poderemos acessar propriedades do jogador como sua posição dentro do script da câmera</p>
+
+<ol>
+  <li>Dentro de Update(), insira o seguinte código:
+    <pre><code class="language-C#">void Update()
+{
+   transform.position = new Vector3(player.transform.position.x, transform.position.y, transform.position.z);
+}
+
+</code></pre>
+  </li>
+</ol>
+
+<p>Note que “transform.position” se refere à posição do objeto que possui o script que estamos escrevendo, neste caso a câmera, enquanto “player.transform.position” se refere a posição do jogador</p>
+
+<p>Esse código fará com que a câmera se movimente horizontalmente para seguir o personagem, mas não verticalmente</p>
+
+<p>A câmera continuará se movimentando onde quer que formos, podendo expor as partes que não queremos que o jogador veja</p>
+
+<p><img src="../../../img/camera_loose.gif" alt="GIF bordas da fase" /></p>
+
+<ol>
+  <li>Para resolver isso, definimos limites ao movimento da câmera, permiindo que ele se mova somente a partir de pontos específicos de x.
+    <ul>
+      <li>Nesse caso a câmera só irá mexer quando ela estiver entre a posição 0 e 50 de x.</li>
+    </ul>
+
+    <pre><code class="language-C">public class CameraMovimentation : MonoBehaviour
+{
+   public GameObject player;
+
+   public float minCameraPosition = 0;
+   public float maxCameraPosition = 50;
+   .
+   .
+   .
+}
+</code></pre>
+    <pre><code class="language-C#">void Update()
+{
+   if(player.transform.position.x &gt;= minCameraPosition &amp;&amp; player.transform.position.x &lt;= maxCameraPosition)
+   {
+      transform.position = new Vector3(player.transform.position.x, transform.position.y, transform.position.z);
+   }
+}
+</code></pre>
+
+    <p><img src="../../../img/camera_limited.gif" alt="GIF camera limitada" /></p>
+  </li>
+</ol>
+
+<h2 id="adicionando-obstáculos">Adicionando obstáculos</h2>
+<p>Com as mecânicas básicas de movimento feitas, agora você pode criar um nível símples como quiser!</p>
+<ol>
+  <li>Adicione plataformas e obstáculos símples, e altere as variáveis de velocidade e pulo do jogador caso ache necessário</li>
+</ol>
+
+<p>⚠ Lembre-se que todos os objetos sólidos precisam ter um collider, você pode addicionar um collider à cada bloco individual de terra/grama caso prefira, para que você possa copiar e colar os objetos à vontade</p>
+
+<ol>
+  <li>
+    <p>Adicione também um objeto, como uma moeda, para ser o objetivo da fase</p>
+
+    <p><img src="../../../img/level_expanded.png" alt="Fase com obstáculos e objetivo" /></p>
+  </li>
+</ol>
+
+<p>Você pode ter percebido que ao pular e colidir com o lado de um bloco, o jogador gruda e para de cair, isso é porque os colliders possuem atrito, que por padrão é bem alto</p>
+
+<p><img src="../../../img/player_stuck.gif" alt="Atrito dos colliders" /></p>
+
+<p>Para mudar o atrito, precisamos atribuir um novo material físico aos colliders</p>
+
+<ol>
+  <li>No explorer, clique com o botão direito do mouse &gt; create &gt; physics material 2D e dê um nome qualquer</li>
+  <li>Selecione o material recém criado e, no inspector, reduza o atrito para 0 (ou qualquer valor desejado)</li>
+  <li>
+    <p>Na barra de pesquisa da aba de hierarquia, digite “t:collider2D”, isso irá destacar na tela todos os objetos que possuem um collider</p>
+
+    <p><img src="../../../img/collider2D.png" alt="comando na barra de pesquisa ressaltando objetos com collider" /></p>
+  </li>
+  <li>
+    <p>Selecione todos os objetos ressaltados (com excessão do player) e arraste o material criado até a caixa “Material” no componente Box Collider 2D</p>
+
+    <p><img src="../../../img/boxcollider2D.png" alt="Material novo no componente" /></p>
+  </li>
+</ol>
+
+<h2 id="fim-da-fase">Fim da fase</h2>
+
+<p>Para oficializar que o player finalizou a fase, vamos fazer com que tocar na moeda nos dê parabéns pelo console!</p>
+
+<ol>
+  <li>Adicione um collider 2D à moeda, de qualquer formato que quiser (tente modificar a propriedade “Edge Radius” do box collider para criar um quadrado com cantos redondos)</li>
+  <li>
+    <p>Adicione também um script à moeda, dentro do qual adicionaremos o código que nos dá parabéns por alcançá-la
+Para detectar que tocamos na moeda, o Unity possui um método (Assim como Start() e Update()) que é chamado sempre que algo entra em contato com o collider do objeto</p>
+  </li>
+  <li>Adicione o seguinte método ao script:
+    <pre><code class="language-C#">public class GameGoalController : MonoBehaviour
+{
+   // Start is called before the first frame update
+   void Start()
+   {
+
+   }
+
+   // Update is called once per frame
+   void Update()
+   {
+
+   }
+
+   // OnCollisionEnter2D é chamado quando uma colisão com outro objeto se inicia
+   void OnCollisionEnter2D(Collision2D other)
+   {
+      Debug.Log("Parabéns, você me achou!");      // Imprime uma mensagem ao console
+   }
+}
+</code></pre>
+    <h2 id="modificando-o-movimento">Modificando o movimento</h2>
+    <p>Até agora, o nosso jogador tem a capacidade de fazer um único pulo… mas poderiamos ter mais possibilidades de design de nível se o jogador tivesse um pulo duplo.
+Podemos também, caso desejarmos, impedir que o jogador faça “wall jump”, fazendo com que os pulos só resetem quando o jogador pisar no chão.</p>
+  </li>
+</ol>
+
+<p>Antes disso, podemos também impedir que o jogador gire marcando a seguinte caixa em seu RigidBody2D</p>
+
+<p><img src="../../../img/freeze.png" alt="Freeze Rotation" /></p>
+
+<h3 id="resetar-pulo-somente-no-chão">Resetar pulo somente no chão</h3>
+<ul>
+  <li>Para fazer o reset pelo chão vamos fazer o sequinte código:</li>
+</ul>
+
+<pre><code class="language-C#">  private void OnCollisionEnter2D(Collision2D other){
+      if (other.contacts[0].normal == Vector2.up) //Se tocar no chão reseta pulo
+      {
+      }
+}
+</code></pre>
+<ul>
+  <li>Essa condição diz que quando o player entrar em colisão essa colisão tem que ser do chão (O vetor “up” ocorre por que o Vetor é criado na direção oposta de onde ocorreu o contato)</li>
+  <li>Dentro dessa condição botaremos o reset para permitir que o player pule novamente</li>
+</ul>
+
+<h3 id="muiltiplos-pulos">Muiltiplos pulos</h3>
+<ul>
+  <li>
+    <p>Para fazer o player realizar multiplos pulos vamos alterar a variável de condição booleana “isJumping” para 2 variáveis interias</p>
+
+    <pre><code class="language-C#"> public int multiJump = 0;
+ public int maxJump = 3;
+</code></pre>
+    <ul>
+      <li>“maxJump” define quanto pulos podemos realizar</li>
+      <li>“multiJump” será atulizada a cada pulo dado</li>
+      <li>Agora, iremos alterar a condição if para pular</li>
+    </ul>
+
+    <pre><code class="language-C#"> if (Input.GetButtonDown("Jump") &amp;&amp; multiJump &lt; maxJump) // Se barra de espaço foi apertada E pulos disponíveis &lt; pulos máximo
+{
+ multiJump += 1;
+}
+</code></pre>
+    <ul>
+      <li>Assim os multiplos pulos pode acontecer enquanto o multiJump não ultrapassar o limite</li>
+      <li>A cada pulo dado vamos acresentar +1 para multiJump</li>
+    </ul>
+
+    <pre><code class="language-C#">private void OnCollisionEnter2D(Collision2D other)
+{
+   if (other.contacts[0].normal == Vector2.up)
+   {
+       multiJump = 0;
+   }
+}
+</code></pre>
+  </li>
+  <li>
+    <p>Assim o player é capaz de dar múltiplos pulos no ar.</p>
+  </li>
+</ul>]]></content><author><name></name></author><summary type="html"><![CDATA[Expandindo a fase]]></summary></entry><entry><title type="html">Inimigos e UI</title><link href="http://localhost:4000/unity-for-women/2024/01/04/InimigosUI.html" rel="alternate" type="text/html" title="Inimigos e UI" /><published>2024-01-04T12:00:00-03:00</published><updated>2024-01-04T12:00:00-03:00</updated><id>http://localhost:4000/unity-for-women/2024/01/04/InimigosUI</id><content type="html" xml:base="http://localhost:4000/unity-for-women/2024/01/04/InimigosUI.html"><![CDATA[<h3 id="inimigos">Inimigos</h3>
+<p>Vamos adicionar uma ameaça ao nosso jogo na forma de um inimigo que fica andando de um lado para o outro</p>
+
+<ol>
+  <li>Crie um novo objeto e dê o sprite que quiser</li>
+  <li>Adicione um Collider2D e customize o formato</li>
+</ol>
+
+<p><img src="../../../img/inimigo_hitbox.png" alt="Inimigo com collider" /></p>
+
+<p>Queremos que esse inimigo fique andando de um lado para o outro, se movendo até uma posição expecífica e trocando de direção</p>
+<ol>
+  <li>Crie um novo script de movimentação para seu inimigo</li>
+  <li>Insira o seguinte código dentro de Update() (e defina a variável speed no início da classe)
+    <pre><code class="language-C#">  void Update()
+  {
+    transform.position += Vector3.right * speed;
+  }
+</code></pre>
+    <p>Sabemos que isso fará o inimigo se deslocar para a direita infinitamente</p>
+  </li>
+  <li>Para definir os limites do seu movimento, crie as seguintes variáveis no início da classe</li>
+</ol>
+
+<pre><code class="language-C#">  public Vector3 startPosition;
+  public Vector3 endPosition;
+  private int direction = 1;
+</code></pre>
+
+<p>E adicione este código em Update()</p>
+<pre><code class="language-C#">  void Update()
+  {
+    transform.position += Vector3.right * speed * direction;
+
+    if (Vector3.Distance(transform.position, startPosition) &lt;= 0.1f)    // if acontece quando o inimigo está dentro de 0.1 unidades de distância da posição final
+    {
+      direction = 1;         // Direção = direita
+    }
+    
+    if (Vector3.Distance(transform.position, endPosition) &lt;= 0.1f)    // if acontece quando o inimigo está dentro de 0.1 unidades de distância da posição final
+    {
+      direction = -1;        // Direção = esquerda
+    }
+  }
+</code></pre>
+
+<p>⚠ Note que simplesmente fazer “transform.position == endPosition” não vai funcionar devido as posições serem floats, é possível que o inimigo ultrapasse a posição final sem que a condição se torne verdadeira</p>
+
+<h4 id="prefabs">Prefabs</h4>
+<p>Agora que temos nosso objeto inimigo criado, podemos querer ter varios inimigos idênticos espalhados pela fase, todos com as mesmas propriedades.</p>
+
+<p>Podemos fazer isso simplesmente copiando e colando o inimigo por ai, mas uma forma muito mais prática é tornar o inimigo em um prefab(pre-fabricated object), um inimigo pronto que podemos adicionar à fase sempre que precisarmos.</p>
+
+<p>Outra vantagem de prefabs é que alterações ao prefab se aplicam a todas as suas instâncias na fase, ou seja, podemos, por exemplo, mudar o sprite do inimigo alterando somente o prefab, sem ter que achar todos os inimigos no nível e alterar seus sprites individualmente(também é possivel modificar instâncias expecíficas de prefabs).</p>
+
+<ol>
+  <li>Para fazer isso, simplesmente arraste seu objeto inimigo da Hierarchy para o local desejado na janela Project</li>
+</ol>
+
+<p>Se tudo der certo, o inimigo irá aparecer dentre os seus arquivos e o inimigo já existente ficará com texto azul</p>
+
+<p><img src="../../../img/inimigo_azul.png" alt="Criação de prefab" /></p>
+
+<h3 id="dano">Dano</h3>
+<p>Precisamos que os inimigos interajam com o jogador de alguma forma, a mais clássica sendo que eles dêem reduzam a vida do jogador</p>
+
+<ol>
+  <li>Vamos primeiro adicionar HP ao script do jogador
+    <pre><code class="language-C#">  public float playerHealth = 100.0f;
+</code></pre>
+  </li>
+</ol>
+
+<p>Agora queremos detectar quando o jogador colide, expecificamente, com um inimigo.</p>
+
+<p>Para isso, precisamos definir o que é um inimigo</p>
+
+<ol>
+  <li>No inspector do inimigo, atribua a ele uma tag (pode ser a tag “Enemy” existente ou uma nova)</li>
+</ol>
+
+<p><img src="../../../img/inimigo_tag.png" alt="Seletor de tags" /></p>
+
+<ol>
+  <li>No script do jogador, adicione o seguinte código dentro de OnCollisionEnter()
+    <pre><code class="language-C#">  private void OnCollisionEnter2D(Collision2D other)
+  {
+ if (other.contacts[0].normal == Vector2.up)
+ {
+     currentJumps = 0;
+
+     //isJumping = false;
+ }
+
+ if (other.gameObject.CompareTag("Enemy"))
+ {
+          
+     playerHealth -= 20;
+     Debug.Log("OUCH " + playerHealth);
+ }
+  }
+</code></pre>
+    <p>Colidir com o inimigo reduzira a vida do jogador em 20 e escrevera uma mensagem no console com sua vida atual.</p>
+  </li>
+</ol>
+
+<h3 id="ui">UI</h3>
+<p>Não basta apenas exibir a vida do jogador no console, pois essa ferramenta só está disponível para nós desenvolvedores. Para que o player seja capaz de ver sua própria vida, precisamos adicionar um HUD</p>
+
+<ol>
+  <li>Crie um novo objeto UI &gt; Canvas.</li>
+  <li>Dê um clique duplo nesse novo objeto. Este vai ser o lugar onde você ira criar sua UI</li>
+</ol>
+
+<p><img src="../../../img/UI_tab.png" alt="Canvas" /></p>
+
+<p>⚠ Não se alarme pelo tamanho do canvas, não é necessário reduzí-lo</p>
+
+<ol>
+  <li>Dentro do seu objeto canvas, crie um novo objeto UI &gt; Text</li>
+  <li>Edite o texto como quiser, a posição do texto no canvas equivalerá a sua posição na tela do jogador
+  <img src="../../../img/UI_posicao.png" alt="texto no canvas" /></li>
+</ol>
+
+<p>(Mudar as opções de Overflow vertical e horizontal para “overflow” pode facilitar)</p>
+
+<p><img src="../../../img/UI_overflow.png" alt="ui no jogo" /></p>
+
+<ol>
+  <li>Dentro do script do jogador, nas primeiras linhas, insira o seguinte código
+    <pre><code class="language-C#">  using UnityEngine.UI;
+</code></pre>
+  </li>
+  <li>Declare a seguinte variável pública
+    <pre><code class="language-C#">  public Text playerHealtText;
+</code></pre>
+  </li>
+</ol>
+
+<p>(Defina essa variável no editor arrastando o objeto texto até a caixinha no script do jogador)</p>
+
+<ol>
+  <li>Dentro de if em OnCollisionEnter(), faça a seguinte alteração (dentro do segundo ‘if’)
+    <pre><code class="language-C#">  private void OnCollisionEnter2D(Collision2D other)
+  {
+ if (other.contacts[0].normal == Vector2.up)
+ {
+     currentJumps = 0;
+
+     //isJumping = false;
+ }
+
+ if (other.gameObject.CompareTag("Enemy"))
+ {
+          
+     playerHealth -= 20;
+     Debug.Log("OUCH " + playerHealth);
+     playerHealtText.text = ("HP: " + playerHealth);
+
+ }
+  }
+</code></pre>
+  </li>
+</ol>
+
+<p>Agora a vida no HUD irá atualizar sempre que o player tomar dano! (mas note que nada a impede de ficar negativa)</p>
+
+<p><img src="../../../img/inimigos_dano.gif" alt="GIF inimigos dando dano e HUD" /></p>]]></content><author><name></name></author><summary type="html"><![CDATA[Inimigos Vamos adicionar uma ameaça ao nosso jogo na forma de um inimigo que fica andando de um lado para o outro]]></summary></entry><entry><title type="html">Movimento do Jogador</title><link href="http://localhost:4000/unity-for-women/2024/01/03/movimentoPlayer.html" rel="alternate" type="text/html" title="Movimento do Jogador" /><published>2024-01-03T12:00:00-03:00</published><updated>2024-01-03T12:00:00-03:00</updated><id>http://localhost:4000/unity-for-women/2024/01/03/movimentoPlayer</id><content type="html" xml:base="http://localhost:4000/unity-for-women/2024/01/03/movimentoPlayer.html"><![CDATA[<p>Adicionando movimento ao jogador</p>
+
+<h2 id="adicionando-física">Adicionando física</h2>
+
+<h3 id="colisão">Colisão</h3>
+<p>Antes de adicionar a física, os objetos precisam ser capazes de interagir entre si, para isso os daremos um corpo físico</p>
+
+<h3 id="corpo-físico">Corpo físico</h3>
+
+<ol>
+  <li>Selecione o seu objeto player</li>
+  <li>Clique na opção “add component”</li>
+  <li>Procure pela opção “Rigidbody 2D”</li>
+</ol>
+
+<p>Esse componente permite modificar a gravidade, atrito, resistência do ar e outros parâmetros.</p>
+
+<h3 id="colisões">Colisões</h3>
+
+<p>Caixas de colisão definem o formato do corpo físico dos objetos, devem ser adicionadas tanto ao jogador como ao chão</p>
+
+<ol>
+  <li>Vá nas características do objeto novamente</li>
+  <li>Adicione um componente</li>
+  <li>Procure por “Box Collider 2D”</li>
+  <li>
+    <p>Clique para editar a caixa de colisão
+  <img src="../../../img/edithitbox.png" alt="Botão de editar collider" /></p>
+  </li>
+  <li>Tente deixar a caixa de colisão o mais próximo o possível do formato dos objetos</li>
+</ol>
+
+<p>Ao rodar o jogo agora, o player terá gravidade e colidirá com o chão a cair, porém, ainda não temos controle sobre ele</p>
+
+<h2 id="movimento-por-transform">Movimento por transform</h2>
+
+<p>Existem algumas formas de adicionar movimento ao jogador, a mais símples é utilizando o componente transform dos objetos, que dita sua posição dentro do jogo</p>
+
+<h3 id="script">Script</h3>
+
+<ol>
+  <li>Para criar um script, adicione um componente ao player com um nome original (ex.: “PlayerMovimentation”) e clique em New Script</li>
+  <li>Abra o script recém criado</li>
+</ol>
+
+<ul>
+  <li>Os scripts Unity vem com funções especificas do Unity. Sendo elas:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void Start()
+</code></pre></div></div>
+<p>Tudo dentro desta função irá rodar uma única vez quando o objeto for criado (ou quando a cena for carregada)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void Update()
+</code></pre></div></div>
+<p>Tudo dentro desta função irá rodar continuamente todo frame que o objeto estiver ativo</p>
+
+<ol>
+  <li>Dentro de Update(), Insirá o seguinte código</li>
+</ol>
+
+<pre><code class="language-C#">void Update()
+{
+	transform.position += Vector3.right; // Move o player para a direita
+}
+</code></pre>
+<p>⚠ Sempre salve quaisquer alterações feitas em scripts</p>
+
+<p>Ao rodar o jogo, você deverá ver o player ir para a direita extremamente rápido, para controlar sua velocidade, podemos fazer a seguinte mudança</p>
+
+<pre><code class="language-C#">void Update()
+{
+	transform.position += speed * Vector3.right; // Move o player para a direita com velocidade controlada
+}
+</code></pre>
+
+<p>E defina a variável speed como um float(número real) no início do script</p>
+
+<pre><code class="language-C#">public class PlayerMovimentation : MonoBehaviour
+{
+	public float speed = 0.1f; //velociade = 0.1
+	  .
+	  .
+	  .
+}
+</code></pre>
+
+<p>Variáveis definidas com “public” podem ser acessadas diretamente pelo editor Unity</p>
+
+<p><img src="../../../img/varsineditor.png" alt="Editando a variável durante execução" /></p>
+
+<h3 id="inputs">Inputs</h3>
+<ol>
+  <li>No canto superior esquerdo, clique em edit &gt; Project Settings</li>
+  <li>Na nova janela aberta, clique em Input Manager &gt; Axes &gt; Horizontal</li>
+  <li>Defina os botões negativo e positivo com as teclas que quiser usar para mover o player para a esquerda e para a direita, respectivamente</li>
+</ol>
+
+<p><img src="../../../img/inputmanager.png" alt="Input Maganer" /></p>
+
+<p>Para permitir que o player seja controlado pelo teclado, fazemos essa modificação dentro de Update()</p>
+
+<pre><code class="language-C#">void Update()
+{
+	var inputX = Input.GetAxis("Horizontal");
+	// inputX = -1 se o player apertar o botão para mover para a esquerda
+        //        =  1 para a direita
+        //        =  0 se nenhum dos dois estiver sendo apertad
+
+	transform.position += inputX * speed * Vector3.right; // Move o player horizontamente quando o botao de movimento estiver pressionado
+}
+</code></pre>
+
+<p><img src="../../../img/keyboardmove.gif" alt="Player sendo controlado pelo teclado" /></p>
+
+<h2 id="movimento-por-rigidbody2d">Movimento por Rigidbody2D</h2>
+<p>Outra maneira de fazer a movimentação do jogador é utilizando seu componente Rigidbody2D, que dita sua velocidade</p>
+
+<p>Para poder interagir com o Rigidbody2D dentro do script, precisamos primeiro defini-lo como um componente da nossa classe</p>
+
+<ol>
+  <li>Declare um novo componente público de tipo Rigidbody2D
+    <pre><code class="language-C#">public class PlayerMovimentation : MonoBehaviour
+{
+public Rigidbody2D myrigidbody; // Cria uma variável que vai guardar as propiedades do componente RigidBody
+public float maxSpeed = 1f; // velociade maxima
+.
+.
+.
+}
+</code></pre>
+  </li>
+  <li>Dentro de Start(), escreva a seguinte linha
+    <pre><code class="language-C#">void Start()
+{
+ myrigidbody = GetComponent&lt;RigidBody2D&gt;(); // variavel é inicializada quando o jogo começa
+}
+</code></pre>
+  </li>
+  <li>
+    <p>Depois de salvar o script, no Unity você verá uma nova variável no componente script do jogador com um valor “None”. Para arrumar isso, clique e segure o RigidBody2D do jogador e leve-o até aquela caixa.</p>
+
+    <p><img src="../../../img/draggingcomponents.png" alt="Arrastando o componente" /></p>
+  </li>
+  <li>Para movimentar o jogador através do Rigidbody2D, escreva o seguinte código em Update()
+    <pre><code class="language-C#">void Update()
+{
+ var inputX = Input.GetAxis("Horizontal");
+  // inputX = -1 se o player apertar o botão para mover para a esquerda
+     //        =  1 para a direita
+     //        =  0 se nenhum dos dois estiver sendo apertad
+
+ myrigidbody.velocity = new Vector2(inputX * maxSpeed, myrigidbody.velocity.y); // Atualiza o player horizontalmente todo frame
+}
+</code></pre>
+  </li>
+</ol>
+
+<h2 id="pulo">Pulo</h2>
+
+<p>Para permitir que o player pule, ao invés de atualizar sua velocidade vertical todo frame como para o movimento horizontal, verificaremos primeiro SE o player está apertando o botão de pulo</p>
+
+<ol>
+  <li>
+    <p>Dentro de Project Settings &gt; Input Manager, vá em Jump e defina o botão positivo assim como feito anteriormente. (escreva “space” caso queira utilizar a barra de espaço)</p>
+  </li>
+  <li>
+    <p>Dentro de Update(), adicione o seguinte código</p>
+    <pre><code class="language-C#">void Update()
+{
+ var x = Input.GetAxis("Horizontal");
+ myrigidbody.velocity = new Vector2(x*speed, myrigidbody.velocity.y); // Atualiza o player horizontalmente todo frame
+
+ //Entra na condição enquanto o batão de "Jump" estiver pressionado
+     if (Input.GetButton("Jump")) {
+     Debug.Log("Você Pulou!"); // Escreve "Você Pulou!" no console
+     }
+}
+</code></pre>
+  </li>
+</ol>
+
+<p>Quando apertarmos o botão de pulo, uma mensagem aparecerá no console de debug</p>
+
+<p><img src="../../../img/console.png" alt="Console de Debug" /></p>
+
+<ol>
+  <li>Dentro da condição if, insira o seguinte código
+    <pre><code class="language-C#">void Update()
+{
+ var inputX = Input.GetAxis("Horizontal");
+ myrigidbody.velocity = new Vector2(inputX * maxSpeed, myrigidbody.velocity.y); // Atualiza o player horizontalmente todo frame
+
+ //Entra na condição enquanto o batão de "Jump" estiver pressionado
+     if (Input.GetButton("Jump")) {
+         Debug.Log("Você Pulou!"); // Escreve "Você Pulou!" no console
+         myrigidbody.velocity += Vector2.up * jumpSpeed; // Acelera o player para cima todo frame
+ }
+}
+</code></pre>
+    <p>E declare a variável jumpSpeed no início da classe</p>
+    <pre><code class="language-C#">public class PlayerMovimentation : MonoBehaviour
+{
+ public float speed = 0.1f; // velocidade horizontal = 0.1
+     public float jumpspeed = 0.5f; // velociade do pulo = 0.5
+     public Rigidbody2D rigidBody; // cria objeto RigidBody2D
+ .
+ .
+ .
+}
+</code></pre>
+  </li>
+</ol>
+
+<ul>
+  <li>O player agora estará pulando, entretanto, como não foi posto um limite, o player ficará pulando eternamente enquanto a barra de espaço estiver pressionada</li>
+  <li>Para limitar seu pulo para 1 vamos criar:
+    <ul>
+      <li>Um variável tipo booleana, iniciamenlte falsa
+        <pre><code class="language-C#"> bool isJumping = false;
+</code></pre>
+      </li>
+      <li>Adicionar uma segunda condição no if em que: Para entrar na condição a barra de espaço deve estar pressionada E isJumping seja falso</li>
+      <li>Dentro da condição if vamos tornar isJumping verdadeiro para que a condição não pule mais de uma vez
+        <pre><code class="language-C#">  if (Input.GetButtonDown("Jump") &amp;&amp; !isJumping) {
+
+ 		isJumping = true;
+   }
+</code></pre>
+      </li>
+      <li>Criar uma função para quando ocorrer colisão, e usar-lá para tornar isJumping falso
+        <pre><code class="language-C#">private void OnCollisionEnter2D (Collision2D other) {
+   isJumping = false;
+  	}
+</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li>O resultado final deve ficar assim
+    <pre><code class="language-C#">void Update(){
+
+      var x = Input.GetAxis("Horizontal");
+      rigidBody.velocity = new Vector2(x*speed, rigidBody.velocity.y); // todo frame a velocidade do rigidbody= velocidade horizontal, velociade vertical permanece a mesma
+
+      // Entre na condição quando apertar a barra de espaço E isJumping = false
+      if (Input.GetButtonDown("Jump") &amp;&amp; !isJumping) 
+      {
+
+          Debug.Log("Jump"); // Quando pular escreve "Jump" no Debug Log
+
+          rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpSpeed); // mantemos a velocidade horizontal e alteramos a vertical
+
+          isJumping = true;
+      }
+
+       
+
+  }
+
+  private void OnCollisionEnter2D (Collision2D other) // Função chamada quando player entra em colisão
+  {
+      isJumping = false;
+  }
+</code></pre>
+
+    <p><img src="../../../img/jumping.gif" alt="jumping" /></p>
+  </li>
+</ul>]]></content><author><name></name></author><summary type="html"><![CDATA[Adicionando movimento ao jogador]]></summary></entry><entry><title type="html">Configurando o ambiente</title><link href="http://localhost:4000/unity-for-women/2024/01/01/Ambiente.html" rel="alternate" type="text/html" title="Configurando o ambiente" /><published>2024-01-01T12:00:00-03:00</published><updated>2024-01-01T12:00:00-03:00</updated><id>http://localhost:4000/unity-for-women/2024/01/01/Ambiente</id><content type="html" xml:base="http://localhost:4000/unity-for-women/2024/01/01/Ambiente.html"><![CDATA[<p>Começaremos baixando e instalando o Unity.</p>
+
+<h2 id="adquirindo-o-unity-hub">Adquirindo o Unity Hub</h2>
+
+<h3 id="download">Download</h3>
+<ul>
+  <li>
+    <p>https://unity.com/pt/download</p>
+
+    <p>ou</p>
+  </li>
+  <li>
+    <p>https://unity.com/download</p>
+  </li>
+</ul>
+
+<p><img src="../../../img/unityhubdownload.png" alt="Página de instalação do Unity Hub, com os links de download de cada OS" /></p>
+
+<h3 id="instalação">Instalação</h3>
+
+<p>1 - Linux</p>
+
+<ul>
+  <li>Abra o terminal (ctrl + alt + T)</li>
+  <li>Acesse sua pasta de downloads (ou a pasta onde você fez o download do instalador) utilizando o comando cd</li>
+  <li>Rode os comandos abaixo:
+    <ul>
+      <li>chmod +x UnityHub.appimage</li>
+      <li>./UnityHub.appimage</li>
+    </ul>
+  </li>
+</ul>
+
+<p>2 - Windows/MAC</p>
+
+<ul>
+  <li>Execute o instalador</li>
+  <li>Siga o processo normalmente</li>
+</ul>
+
+<h2 id="configurando-o-unity-hub">Configurando o Unity Hub:</h2>
+<p>⚠Caso apareça a tela de licença, você pode ativar uma licença gratuita Unity Personal ou, se quiser, adquirir uma licença de estudante universitário utilizando suas credenciais institucionais</p>
+<ol>
+  <li>
+    <p>Clique em Install &gt; Install Editor ou Add
+   <img src="../../../img/installeditor.png" alt="Install Editor no Unity Hub" /></p>
+  </li>
+  <li>
+    <p>Selecione a versão LTS(Long Term Support) mais recente e clique Install
+   <img src="../../../img/selecaover.png" alt="Seleção de versões para instalação" /></p>
+  </li>
+  <li>Na tela de módulos, desselecione as outras opções caso necessário</li>
+  <li>Remova versões anteriores caso necessário</li>
+</ol>
+
+<h2 id="criando-um-projeto-unity">Criando um projeto Unity</h2>
+<ol>
+  <li>
+    <p>Clique em Projects &gt; New project
+   <img src="../../../img/projetos.png" alt="Tela de projetos do Unity Hub" /></p>
+  </li>
+  <li>
+    <p>Selecione o template 3D e nomeie seu projeto como desejar
+   <img src="../../../img/novoprojeto.png" alt="Tela de novo projeto" /></p>
+  </li>
+  <li>
+    <p>Clique em seu projeto recém criado para abri-lo (pode demorar vários minutos)</p>
+  </li>
+</ol>
+
+<h2 id="configuração-de-ide">Configuração de IDE</h2>
+<p>Para este workshop recomendamos o uso de Visual Studio Community pela funcionalidade nativa de code completion de C# para Unity. Se desejar usar outra IDE, siga o passo 3 para definí-la como padrão do Unity; recomendamos também procurar recursos on-line sobre plugins de code completion Unity para sua IDE.</p>
+
+<ol>
+  <li>Baixe <a href="https://visualstudio.microsoft.com/pt-br/vs/community/">Visual Studio Community</a>(é nescessário ter uma conta microsoft)</li>
+  <li>
+    <p>Ao configurar a instalação, selecione a carga de trabalho para Unity
+   <img src="../../../img/cargatrabalho.png" alt="Carga de trabalho Unity" /></p>
+  </li>
+  <li>Dentro do unity vá em Edit&gt;Preferences&gt;External Tools&gt;External Script Editor e selecione “Microsoft Visual Studio 2022”</li>
+</ol>
+
+<p><img src="../../../img/externaltools.png" alt="Caminho para visual studio 2022" /></p>
+
+<p>⚠Caso a opção não apareça, selecione browse e escolha o executável do Visual Studio na pasta de instalação “devenv.exe”</p>
+
+<h2 id="básicos-do-unity">Básicos do Unity</h2>
+
+<h3 id="movimentos">Movimentos</h3>
+
+<ul>
+  <li>Clique e segure com o botão direito enquanto move o mouse na tela interativa para olhar em direções diferentes</li>
+  <li>Use a rodinha do mouse para movimentar-se para frente e para trás</li>
+  <li>Aperte e segure a rodinha do mouse para movimentar a perspectiva lateralmente (segure shift para acelerar)</li>
+</ul>
+
+<h3 id="câmera">Câmera</h3>
+<ul>
+  <li>Pode-se alterar entre a perspectiva de jogador e developer com as abas “Game” e “Scene” na parte superior da tela</li>
+  <li>Clicando no objeto câmera mostra a parte do ambiente 3D que será mostrada no jogo (Também pode ser visto através da aba “Game”)</li>
+</ul>
+
+<h3 id="obejeto-e-componente">Obejeto e Componente</h3>
+
+<ol>
+  <li>
+    <p>Para criar nosso primeiro objeto, clique com o botão direito na aba “Hierarchy” à esquerda, em seguida selecione 3D Object &gt; Cube
+   <img src="../../../img/createcube.png" alt="Criando um cubo" /></p>
+  </li>
+  <li>
+    <p>Para adicionar física ao seu objeto, utilizaremos um componente chamado RigidBody:</p>
+    <ul>
+      <li>Clique no objeto para exibir seus componentes na aba “Inspector” na direita</li>
+      <li>Clique em “Add Component” no fim da aba</li>
+      <li>Busque e adicione a opção RigidBody
+ <img src="../../../img/rigidbody.png" alt="Selecionando o RigidBody para o cubo" /></li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="testar-jogo">Testar jogo</h3>
+<ul>
+  <li>Verifique na perspectiva de jogo para confirmar se o cubo está visível em tela
+    <ul>
+      <li>Caso não esteja, clique no cubo na perspectiva de edição e utilize os controles de posição(setas coloridas) para movê-lo até estar na frente da câmera</li>
+    </ul>
+  </li>
+  <li>
+    <p>Clique no botão play na parte superior para começar a execução do jogo
+   <img src="../../../img/teste.png" alt="Botões de teste do Unity" /></p>
+  </li>
+  <li>
+    <p>Você deverá observar o cubo criado caindo</p>
+
+    <p><img src="../../../img/cubocaindo.gif" alt="Gif mostrando o cubo caindo" /></p>
+  </li>
+  <li>Nos controles superiores, você pode pausar ou parar a execução do jogo</li>
+</ul>
+
+<p>⚠Lembre-se que modificações feitas à objetos ou componentes em cena enquanto o jogo está rodando não serão salvas.</p>]]></content><author><name></name></author><summary type="html"><![CDATA[Começaremos baixando e instalando o Unity.]]></summary></entry><entry><title type="html">Primeiro nível</title><link href="http://localhost:4000/unity-for-women/2024/01/01/primeiroNivel.html" rel="alternate" type="text/html" title="Primeiro nível" /><published>2024-01-01T12:00:00-03:00</published><updated>2024-01-01T12:00:00-03:00</updated><id>http://localhost:4000/unity-for-women/2024/01/01/primeiroNivel</id><content type="html" xml:base="http://localhost:4000/unity-for-women/2024/01/01/primeiroNivel.html"><![CDATA[<p>Os básicos do unity, criando e posicionando objetos</p>
+
+<h2 id="adquirindo-assets">Adquirindo assets</h2>
+
+<p>Para esse tutorial, partiremos de um <a href="https://github.com/Duerno/unity-for-women-at-unb">projeto Unity</a> que possui uma coleção de sprites prontos.</p>
+
+<ol>
+  <li>
+    <p>Baixe o repositório e extraia o arquivo .zip
+<img src="../../../img/repodownl.png" alt="Download de repositório no Github" /></p>
+  </li>
+  <li>
+    <p>Em seguida, no Unity Hub, na aba Projects, clique em add/open e selecione a pasta “workshop” dentro da pasta do repositório baixado
+<img src="../../../img/openproj.png" alt="Open em Unity Hub" /></p>
+  </li>
+  <li>Selecione a versão 2019.4.9f1 LTS ou a versão mais próxima disponível</li>
+  <li>Abra o projeto</li>
+</ol>
+
+<h2 id="primeiros-passos-no-projeto">Primeiros passos no projeto</h2>
+
+<p>⚠Projeto tem que ter aberto em uma tela vazia</p>
+
+<h3 id="alteração-de-um-objeto-numa-cena">Alteração de um objeto numa cena</h3>
+
+<ul>
+  <li>Cena engloba tudo que está renderizado(ativo) no unity</li>
+  <li>A alteração de um objeto pode ser feito dentro da cena ou na aba inspector</li>
+  <li>Algumas propriedades devem ser feitas na aba inspector</li>
+</ul>
+
+<p>Algumas alterações são:</p>
+<ol>
+  <li>
+    <p>Scale: Tamanho e proporções do objeto</p>
+  </li>
+  <li>
+    <p>Rotation: Rotação do objeto nos eixos x,y,z</p>
+  </li>
+  <li>
+    <p>Position: Posição do objeto na cena</p>
+  </li>
+  <li>
+    <p>Scene rotation: Rotação da Cena (a sua perspectiva como desenvolvedor)
+<img src="../../../img/Object_shenags.png" alt="Locais das alterações no unity" /></p>
+  </li>
+</ol>
+
+<h3 id="criação-do-nível">Criação do nível</h3>
+
+<ol>
+  <li>
+    <p>Clicando no objeto Câmera, garanta que está em modo orthographic e que os objetos que você criar a seguir estão dentro do campo de visão dela, é recomendado também trocar a perspectiva de edição para modo 2D
+<img src="../../../img/camerasett.png" alt="Opções da câmera no Unity" /></p>
+  </li>
+  <li>Na aba project na parte inferior da tela, navegue até Assets &gt; Part I &gt; Scenes
+    <ul>
+      <li>Você verá uma cena chamada “Part I”, apague ela e crie uma nova (botão direito &gt; Create &gt; Scene) com o nome que desejar, em seguida abra-a
+<img src="../../../img/createscene.png" alt="Criação da cena nova" /></li>
+    </ul>
+  </li>
+  <li>
+    <p>Na aba Hierarchy, crie um objeto vazio (Create Empty)</p>
+  </li>
+  <li>
+    <p>Com o novo objeto selecionado, adicione o componente sprite renderer</p>
+  </li>
+  <li>
+    <p>Abra o explorador de sprites e selecione um sprite de chão
+<img src="../../../img/addsprite.png" alt="Adicionando Sprite" /></p>
+  </li>
+  <li>Para expandir o chão, crie cópias do objeto e alinha as cópias lado a lado
+    <ul>
+      <li>Segurar Ctrl pode facilitar o alinhamento
+<img src="../../../img/dafloo.png" alt="Chão expandido" /></li>
+    </ul>
+  </li>
+  <li>
+    <p>Para organização, crie um objeto vazio que guardará todos os chãos, e os insira dentro desse objeto
+<img src="../../../img/organized.png" alt="Objeto Chão" /></p>
+  </li>
+  <li>
+    <p>Adicione a parte subterrânea do chão para preencher a tela, da mesma forma como anteriormente
+<img src="../../../img/undergr.png" alt="Chão com subterrâneo" /></p>
+  </li>
+  <li>
+    <p>Crie um novo sprite renderer para o background e adicione um sprite como feito anteriormente
+<img src="../../../img/background.png" alt="Background" /></p>
+  </li>
+  <li>Por fim, crie mais um sprite para representar o personagem principal, daremos movimento à ele no proximo tutorial
+<img src="../../../img/bgwithplayer.png" alt="Player" /></li>
+</ol>
+
+<p>⚠ Certifique-se de posicionar o background atrás do seu chão e do player (valor da posição em Z superior) pois, caso esteja na frente, a visão do nível sera obscurecida e, caso esteja no mesmo valor em Z, pode ocorrer um fenômeno visual chamado Z-fighting ou Stitching</p>
+
+<p><img src="../../../img/Z_fighting-1915736467.gif" alt="Z-fighting" /></p>]]></content><author><name></name></author><summary type="html"><![CDATA[Os básicos do unity, criando e posicionando objetos]]></summary></entry></feed>
