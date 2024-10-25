@@ -41,6 +41,8 @@ navigation_header:
   url: /about/
 - title: Tutoriais
   url: /tutorials/
+- title: GitHub
+  url: https://github.com/BOSS-BigOpenSourceSibling/unity-for-women
 
 # Footer nav
 navigation_footer:
